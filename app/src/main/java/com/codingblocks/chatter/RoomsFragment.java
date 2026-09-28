@@ -36,6 +36,7 @@ import okhttp3.Response;
 
 public class RoomsFragment extends Fragment {
 
+    private static final String TAG = "RoomsFragment";
     private RoomsAdapter adapter;
 
     public RoomsFragment() {
@@ -49,6 +50,7 @@ public class RoomsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: Creating RoomsFragment view");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_rooms, container, false);
         ButterKnife.bind(this,view);
@@ -87,8 +89,10 @@ public class RoomsFragment extends Fragment {
     }
 
     public void displayRooms(RealmResults<RoomsTable> rooms){
+        Log.d(TAG, "displayRooms: Displaying " + rooms.size() + " rooms");
         /* No rooms, let's get them first */
         if(rooms.size() == 0){
+            Log.d(TAG, "displayRooms: No rooms found locally, fetching from server");
             /* Internet is needed for sure to get the rooms */
             getRooms(1);
         }
@@ -102,7 +106,9 @@ public class RoomsFragment extends Fragment {
     }
 
     public void getRooms(int severity){
+        Log.d(TAG, "getRooms: Fetching rooms with severity=" + severity);
         if(isNetworkAvailable()) {
+            Log.d(TAG, "getRooms: Network available, syncing rooms");
             /* Display a toast to inform the user that we are syncing */
             Toast.makeText(
                     getActivity(), "Syncing data", Toast.LENGTH_SHORT
@@ -132,6 +138,7 @@ public class RoomsFragment extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response)
                         throws IOException {
+                    Log.d(TAG, "onResponse: Received response from server, code=" + response.code());
                     /* Simple hack for compatibility as API 19 is required for
                        new JSONArray */
                     final String responseText = "{\"rooms\":"+response.body().string()+"}";
@@ -142,6 +149,7 @@ public class RoomsFragment extends Fragment {
                             try {
                                 JSONObject JObject = new JSONObject(responseText);
                                 JSONArray JArray = JObject.getJSONArray("rooms");
+                                Log.d(TAG, "Processing " + JArray.length() + " rooms from response");
                                 int i;
                                 for(i = 0; i < JArray.length(); i++){
                                     // Initialize Realm
