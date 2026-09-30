@@ -25,6 +25,7 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import timber.log.Timber;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -37,6 +38,7 @@ public class DashboardActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Timber.d("onCreate: DashboardActivity created");
         setContentView(R.layout.activity_dashboard);
         ButterKnife.bind(this);
 
@@ -69,11 +71,13 @@ public class DashboardActivity extends AppCompatActivity {
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                        Timber.e(e, "Failed to fetch user data from API");
                         e.printStackTrace();
                     }
 
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                        Timber.d("Received API response for user data");
                         try {
                             String responseText = response.body().string();
                             JSONObject Jobject = new JSONObject(responseText);
@@ -133,6 +137,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     public void selectFragment(int id){
+        Timber.d("selectFragment: Switching to fragment with id=%d", id);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         switch(id) {
             case R.id.action_dashboard:
@@ -158,6 +163,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     public void openRoom(String id){
+        Timber.d("openRoom: Opening room with id=%s", id);
         Bundle bundle = new Bundle();
         bundle.putString("RoomId", id);
         RoomFragment roomFragment = new RoomFragment();
