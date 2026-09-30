@@ -7,12 +7,15 @@ import android.accounts.NetworkErrorException;
 import android.content.Context;
 import android.os.Bundle;
 
+import timber.log.Timber;
+
 /* Implementation of AbstractAccountAuthenticator with
    stubbed out methods */
 public class Authenticator extends AbstractAccountAuthenticator {
 
     public Authenticator(Context context) {
         super(context);
+        Timber.d("Authenticator initialized");
     }
 
     @Override
@@ -28,6 +31,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
             String s2,
             String[] strings,
             Bundle bundle) throws NetworkErrorException {
+        Timber.d("addAccount called with account type: %s", s);
         return null;
     }
 
@@ -45,6 +49,7 @@ public class Authenticator extends AbstractAccountAuthenticator {
             Account account,
             String s,
             Bundle bundle) throws NetworkErrorException {
+        Timber.d("getAuthToken called for account: %s", account.name);
         return null;
     }
 
