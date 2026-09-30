@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import io.realm.RealmResults;
+import timber.log.Timber;
 
 public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MyViewHolder>{
 
@@ -30,6 +31,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MyView
         public MessagesAdapter(RealmResults<MessagesTable> messages, Context context) {
             this.messages = messages;
             this.context = context;
+            Timber.d("MessagesAdapter initialized with %d messages", messages.size());
         }
 
         @Override
@@ -43,6 +45,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MyView
         @Override
         public void onBindViewHolder(final MessagesAdapter.MyViewHolder myViewHolder, int i) {
             MessagesTable message = messages.get(i);
+            Timber.d("Binding message %d from user %s", i, message.getDisplayName());
             myViewHolder.username.setText(message.getDisplayName());
             // A timestamp looks like this 2014-03-25T11:51:32.289Z
             String timestamp = message.getTimestamp();
@@ -57,6 +60,8 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.MyView
 
         @Override
         public int getItemCount() {
-            return messages.size();
+            int count = messages.size();
+            Timber.d("getItemCount returning %d messages", count);
+            return count;
         }
 }
