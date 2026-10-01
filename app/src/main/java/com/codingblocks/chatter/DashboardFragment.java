@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 
 import butterknife.ButterKnife;
 
+import timber.log.Timber;
+
 public class DashboardFragment extends Fragment {
 
     public DashboardFragment() {
@@ -17,10 +19,18 @@ public class DashboardFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Timber.d("DashboardFragment onCreateView");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_dashboard, container, false);
         ButterKnife.bind(view);
+        Timber.d("DashboardFragment view bound with ButterKnife");
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Timber.d("DashboardFragment onDestroyView");
     }
 
 }

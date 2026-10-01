@@ -37,6 +37,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import timber.log.Timber;
+
 public class RoomFragment extends Fragment {
 
     public RoomFragment() {
@@ -52,12 +54,14 @@ public class RoomFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Timber.d("RoomFragment onCreateView");
         View view = inflater.inflate(R.layout.fragment_room, container, false);
         ButterKnife.bind(view);
         Bundle bundle = this.getArguments();
 
         final String roomId = bundle.getString("RoomId", " ");
         if(roomId.equals(" ")) {
+            Timber.e("RoomFragment Error: no room id has been passed");
             Toast.makeText(
                     this.getContext(),
                     "Error no room id has been passed",
@@ -142,8 +146,10 @@ public class RoomFragment extends Fragment {
     }
 
     public void displayMessages(RealmResults<MessagesTable> messages, String roomId){
+        Timber.d("displayMessages: Displaying " + messages.size() + " messages for room " + roomId);
         /* No messages, let's get them first */
         if(messages.size() == 0){
+            Timber.d("displayMessages: No messages found locally, fetching from server");
             getMessages(1, roomId);
         }
         RecyclerView.Adapter adapter =
@@ -155,8 +161,10 @@ public class RoomFragment extends Fragment {
     }
 
     public void getMessages(int severity, final String roomId){
+        Timber.d("getMessages: Fetching messages with severity=" + severity + " for room " + roomId);
         if(isNetworkAvailable()) {
         /* Display a toast to inform the user that we are syncing */
+            Timber.d("getMessages: Network available, syncing messages");
             Toast.makeText(
                     getActivity(), "Syncing data", Toast.LENGTH_SHORT
             ).show();
@@ -185,6 +193,7 @@ public class RoomFragment extends Fragment {
                         throws IOException {
                 /* Simple hack for compatibility as API 19 is required for
                        new JSONArray */
+                    Timber.d("getMessages onResponse: Received response from server, code=" + response.code());
                     final String responseText = "{\"messages\":" + response.toString() + "}";
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
@@ -192,6 +201,7 @@ public class RoomFragment extends Fragment {
                             try {
                                 JSONObject JObject = new JSONObject(responseText);
                                 JSONArray JArray = JObject.getJSONArray("messages");
+                                Timber.d("getMessages Processing " + JArray.length() + " messages from response");
                                 int i;
                                 for (i = 0; i < JArray.length(); i++) {
                                     // Initialize Realm
@@ -267,7 +277,7 @@ public class RoomFragment extends Fragment {
     }
 
     public void sendMessage(RealmResults<RoomsTable> currentRoom){
-
+        Timber.d("sendMessage: Sending message");
         String messageText = inputMessage.getText().toString();
         // Initialize Realm
         Realm.init(getActivity().getApplicationContext());
@@ -329,6 +339,7 @@ public class RoomFragment extends Fragment {
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     try {
+                        Timber.d("sendMessage onResponse: Received response from server, code=" + response.code());
                         String responseText = response.body().string();
                         JSONObject dynamicJObject = new JSONObject(responseText);
                         final String uId = dynamicJObject.getString("id");
@@ -338,6 +349,7 @@ public class RoomFragment extends Fragment {
                         JSONObject userObject = dynamicJObject.getJSONObject("fromUser");
                         final String displayName = userObject.getString("displayName");
                         final String username = userObject.getString("username");
+                        Timber.d("sendMessage Successfully sent message with id=" + uId);
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
